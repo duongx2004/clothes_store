@@ -106,7 +106,7 @@ clothes_store/
 
 1. **Clone repository** (hoặc tạo mới từ source code)
    ```bash
-   git clone <your-repo-url>
+   git clone <[your-repo-url](https://github.com/duongx2004/clothes_store)>
    cd clothes_store
    
 2. **Cài đặt dependencies PHP**
