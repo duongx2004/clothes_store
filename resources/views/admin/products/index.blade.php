@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Quản lý sản phẩm')
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between mb-3">
     <h1>Sản phẩm</h1>
-    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Thêm sản phẩm</a>
+    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ Thêm sản phẩm</a>
 </div>
 <table class="table table-bordered">
     <thead>
@@ -26,7 +26,7 @@
             <td>{{ $product->stock }}</td>
             <td>
                 <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning">Sửa</a>
-                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa?')">
+                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa sản phẩm?')">
                     @csrf @method('DELETE')
                     <button class="btn btn-sm btn-danger">Xóa</button>
                 </form>

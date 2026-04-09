@@ -19,6 +19,7 @@ class CartController extends Controller
     {
         $product = Product::findOrFail($id);
         $cart = session()->get('cart', []);
+
         if (isset($cart[$id])) {
             $cart[$id]['quantity']++;
         } else {
@@ -30,7 +31,7 @@ class CartController extends Controller
             ];
         }
         session()->put('cart', $cart);
-        return back()->with('success', 'Đã thêm vào giỏ');
+        return back()->with('success', 'Đã thêm vào giỏ hàng');
     }
 
     public function remove($id)

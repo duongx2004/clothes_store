@@ -3,18 +3,11 @@
 @section('content')
 <h1>Giỏ hàng</h1>
 @if(empty($cart))
-    <p>Giỏ hàng trống.</p>
+    <div class="alert alert-info">Giỏ hàng trống.</div>
 @else
-        <table class="table">
+    <table class="table">
         <thead>
-            <tr>
-                <th>Hình ảnh</th>
-                <th>Sản phẩm</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
-                <th></th>
-            </tr>
+            <tr><th>Hình ảnh</th><th>Sản phẩm</th><th>Giá</th><th>Số lượng</th><th>Thành tiền</th><th></th></tr>
         </thead>
         <tbody>
             @php $total = 0; @endphp
@@ -23,9 +16,9 @@
                 <tr>
                     <td>
                         @if(!empty($item['image']))
-                            <img src="{{ asset('images/products/'.$item['image']) }}" class="cart-product-img" alt="{{ $item['name'] }}">
+                            <img src="{{ asset('images/products/'.$item['image']) }}" width="60" height="60" style="object-fit: cover;">
                         @else
-                            <img src="https://via.placeholder.com/60" class="cart-product-img">
+                            <img src="https://via.placeholder.com/60" width="60">
                         @endif
                     </td>
                     <td>{{ $item['name'] }}</td>
@@ -40,9 +33,9 @@
                     </td>
                 </tr>
             @endforeach
-            <tr>
-                <td colspan="4" class="text-end"><strong>Tổng cộng:</strong></td>
-                <td><strong>{{ number_format($total) }} VNĐ</strong></td>
+            <tr class="table-active">
+                <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
+                <td class="fw-bold">{{ number_format($total) }} VNĐ</td>
                 <td></td>
             </tr>
         </tbody>
@@ -50,8 +43,8 @@
     <form action="{{ route('checkout') }}" method="POST">
         @csrf
         <div class="mb-3">
-            <label>Địa chỉ giao hàng</label>
-            <textarea name="address" class="form-control" required></textarea>
+            <label class="form-label">Địa chỉ giao hàng</label>
+            <textarea name="address" class="form-control" rows="2" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>

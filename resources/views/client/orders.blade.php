@@ -3,16 +3,11 @@
 @section('content')
 <h1>Đơn hàng của tôi</h1>
 @if($orders->isEmpty())
-    <p>Chưa có đơn hàng nào.</p>
+    <div class="alert alert-info">Chưa có đơn hàng nào.</div>
 @else
     <table class="table">
         <thead>
-            <tr>
-                <th>Mã đơn</th>
-                <th>Ngày đặt</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-            </tr>
+            <tr><th>Mã đơn</th><th>Ngày đặt</th><th>Tổng tiền</th><th>Trạng thái</th></tr>
         </thead>
         <tbody>
             @foreach($orders as $order)
