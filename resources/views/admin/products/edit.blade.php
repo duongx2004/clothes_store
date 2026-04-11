@@ -1,5 +1,5 @@
-@extends('layouts.app')
-@section('title', 'Sửa sản phẩm')
+@extends('admin.layouts.app')
+@section('title', 'Quản lý sản phẩm')
 @section('content')
 <h1>Sửa sản phẩm: {{ $product->name }}</h1>
 <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">

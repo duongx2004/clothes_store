@@ -31,6 +31,12 @@ class CartController extends Controller
             ];
         }
         session()->put('cart', $cart);
+
+        // Nếu là mua ngay (có field buy_now), chuyển hướng đến giỏ hàng
+        if ($request->has('buy_now')) {
+            return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm, vui lòng kiểm tra giỏ hàng.');
+        }
+        session()->put('cart', $cart);
         return back()->with('success', 'Đã thêm vào giỏ hàng');
     }
 

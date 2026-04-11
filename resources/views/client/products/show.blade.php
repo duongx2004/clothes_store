@@ -150,51 +150,37 @@
         </div>
         <div class="product-right">
             <h2>{{ $product->name }}</h2>
-            <p><strong>Thương hiệu:</strong> AllainStore</p>
+            <p><strong>Thương hiệu:</strong> {{ $product->brand->name ?? 'Chưa xác định' }}</p>
             <p><strong>Danh mục:</strong> {{ $product->category->name ?? 'Chưa phân loại' }}</p>
             <p><strong>Giá:</strong> {{ number_format($product->price, 0, ',', '.') }}₫</p>
             <p><strong>Tồn kho:</strong> {{ $product->stock }}</p>
             <p>{{ $product->description }}</p>
-            <button type="button" class="btn btn-primary" onclick="addToCart({{ $product->id }})">
-                <i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG
-            </button>
-            <button type="button" class="btn btn-success" onclick="buyNow({{ $product->id }})">
-                <i class="bi bi-wallet2"></i> MUA NGAY
-            </button>
+
+            {{-- Form THÊM VÀO GIỎ HÀNG --}}
+            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG
+                </button>
+            </form>
+
+            {{-- Form MUA NGAY (thêm hidden field để controller biết) --}}
+            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="buy_now" value="1">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-wallet2"></i> MUA NGAY
+                </button>
+            </form>
         </div>
     </div>
 
-    {{-- <div class="product-related">
-        <h2 class="section-title mb-4">Sản phẩm cùng loại</h2>
-        <div class="product-grid">
-            @forelse($relatedProducts as $related)
-                <a href="{{ route('products.show', $related->slug) }}" class="product-link">
-                    <div class="product-card">
-                        <div class="product-image">
-                            <img src="{{ $related->image ? asset('images/products/'.$related->image) : 'https://via.placeholder.com/235' }}" 
-                                 alt="{{ $related->name }}">
-                        </div>
-                        <div class="product-details">
-                            <h3 class="product-title">{{ $related->name }}</h3>
-                            <div class="brand-category">
-                                <span class="brand">AllainStore</span>
-                                <span class="category">{{ $related->category->name ?? '' }}</span>
-                            </div>
-                            <div class="price-container">
-                                <span class="original-price">{{ number_format($related->price * 1.5, 0, ',', '.') }}₫</span>
-                                <span class="discount-price">{{ number_format($related->price, 0, ',', '.') }}₫</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            @empty
-                <div class="no-results">Không tìm thấy sản phẩm nào cùng loại</div>
-            @endforelse
-        </div>
-    </div>
-</div> --}}
+    {{-- Sản phẩm cùng loại (bỏ comment nếu có biến $relatedProducts) --}}
+    {{-- <div class="product-related"> ... </div> --}}
+</div>
 
 <script>
+// Hàm phóng to ảnh (giữ lại vì là tiện ích, không liên quan logic Laravel)
 function openFullscreen(imgElement) {
     var fullscreenDiv = document.createElement('div');
     fullscreenDiv.style.position = 'fixed';
@@ -216,81 +202,6 @@ function openFullscreen(imgElement) {
     fullscreenImg.style.maxHeight = '90%';
     fullscreenDiv.appendChild(fullscreenImg);
     document.body.appendChild(fullscreenDiv);
-}
-
-function showAlert(message, type) {
-    const alertDiv = document.createElement("div");
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.role = "alert";
-    alertDiv.innerHTML = message + 
-        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-    alertDiv.style.position = "fixed";
-    alertDiv.style.top = "20px";
-    alertDiv.style.left = "35%";
-    alertDiv.style.zIndex = "1050";
-    document.body.appendChild(alertDiv);
-    setTimeout(() => {
-        alertDiv.classList.remove("show");
-        alertDiv.classList.add("hide");
-        setTimeout(() => { 
-            if (document.body.contains(alertDiv)) document.body.removeChild(alertDiv); 
-        }, 500);
-    }, 3000);
-}
-
-function showError(message) {
-    showAlert(message, "danger");
-}
-
-function showSuccess(message) {
-    showAlert(message, "success");
-}
-
-function addToCart(productId) {
-    fetch("{{ route('cart.add', '') }}/" + productId, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccess("Sản phẩm đã được thêm vào giỏ hàng!");
-        } else {
-            showError("Có lỗi xảy ra: " + (data.error || "Không xác định"));
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        showError("Đã xảy ra lỗi khi thêm sản phẩm.");
-    });
-}
-
-function buyNow(productId) {
-    fetch("{{ route('cart.add', '') }}/" + productId, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccess("Sản phẩm đã được thêm vào giỏ hàng!");
-            setTimeout(() => { 
-                window.location.href = "{{ route('cart.index') }}"; 
-            }, 1500);
-        } else {
-            showError("Có lỗi xảy ra: " + (data.error || "Không xác định"));
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        showError("Đã xảy ra lỗi khi thêm sản phẩm.");
-    });
 }
 </script>
 @endsection

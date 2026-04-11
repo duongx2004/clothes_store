@@ -1,5 +1,5 @@
-@extends('layouts.app')
-@section('title', 'Thêm sản phẩm')
+@extends('admin.layouts.app')
+@section('title', 'Quản lý sản phẩm')
 @section('content')
 <h1>Thêm sản phẩm</h1>
 <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">

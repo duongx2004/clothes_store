@@ -29,11 +29,9 @@
                             {{ auth()->user()->name }}
                         </button>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Thông tin tài khoản</a></li>
+                            <li><a class="dropdown-item" href="{{ route('change.password.form') }}">Đổi mật khẩu</a></li>
                             <li><a class="dropdown-item" href="{{ route('client.orders') }}">Đơn hàng của tôi</a></li>
-                            @if(auth()->user()->isAdmin())
-                                <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Quản lý sản phẩm</a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">Quản lý đơn hàng</a></li>
-                            @endif
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
