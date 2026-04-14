@@ -169,6 +169,7 @@ clothes_store/
    http://127.0.0.1:8000
 
 🔐 Tài khoản mặc định (sau khi seed)
+
 Admin:
 ```bash
 admin@example.com
@@ -185,6 +186,7 @@ user@example.com
 ```
 🧪 Hướng dẫn sử dụng
 Khách hàng
+
 Đăng ký tài khoản mới hoặc đăng nhập bằng tài khoản customer.
 
 Trang chủ hiển thị banner, sản phẩm nổi bật.
@@ -251,7 +253,11 @@ Lỗi middleware admin không hoạt động: đăng ký trong app/Http/Kernel.p
 Lỗi create() argument count: đảm bảo method create() trong RegisteredUserController không có tham số.
 
 📝 Phân công việc:
+
 Lê Nho Dương: Xây dựng các trang Auth, Admin và các chức năng cần thiết của trang
+
 Hà Quang Nhuận: Xây dựng trang chủ chính và các Controller liên quan
+
 Mai Đức Long: Xây dựng trang Cart và các Controller liên quan
+
 Đăng Văn Minh: Xây dựng trang Product và các Controller liên quan
