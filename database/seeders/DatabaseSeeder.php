@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $category = Category::create(['name' => 'Áo thun', 'slug' => 'ao-thun']);
-        $brand = Brand::create(['name' => 'ThugShaker', 'slug' => 'ThugShaker']);
+        $brand = Brand::create(['name' => 'ThugShaker', 'slug' => 'thug-saker']);
 
         Product::create([
             'name' => 'Áo My NIGGA',
@@ -35,6 +35,16 @@ class DatabaseSeeder extends Seeder
             'price' => 150000,
             'stock' => 10,
             'image' => 'my-nigga.jpg',
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+        ]);
+        Product::create([
+            'name' => 'Áo Phông Natus Vincere',
+            'slug' => 'natus-vincere',
+            'description' => 'Thích hợp cho hoạt động thể thao điện tử',
+            'price' => 200000,
+            'stock' => 5,
+            'image' => 'ao-navi.jpg',
             'category_id' => $category->id,
             'brand_id' => $brand->id,
         ]);
