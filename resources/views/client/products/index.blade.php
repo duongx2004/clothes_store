@@ -230,10 +230,7 @@
             <h2 class="filter-title">Bộ lọc sản phẩm</h2>
             <p class="filter-description">Chọn nhãn hàng và cách sắp xếp giá để tìm sản phẩm nhanh hơn.</p>
         </div>
-        <div class="filter-badge">
-            <i class="bi bi-funnel"></i>
-            Lọc nhanh
-        </div>
+   
     </div>
 
     <form method="GET" action="{{ route('products.index') }}" class="filter-grid">

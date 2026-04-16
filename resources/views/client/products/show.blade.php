@@ -156,9 +156,15 @@
             <p><strong>Tồn kho:</strong> {{ $product->stock }}</p>
             <p>{{ $product->description }}</p>
 
+            <div class="mb-3" style="max-width: 140px;">
+                <label for="quantity-product" class="form-label">Số lượng</label>
+                <input id="quantity-product" type="number" class="form-control" min="1" max="{{ $product->stock }}" value="1" {{ $product->stock < 1 ? 'disabled' : '' }}>
+            </div>
+
             {{-- Form THÊM VÀO GIỎ HÀNG --}}
             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
                 @csrf
+                <input type="hidden" name="quantity" value="1" class="quantity-sync">
                 <button type="submit" class="btn btn-success">
                     <i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG
                 </button>
@@ -168,6 +174,7 @@
             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
                 @csrf
                 <input type="hidden" name="buy_now" value="1">
+                <input type="hidden" name="quantity" value="1" class="quantity-sync">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-wallet2"></i> MUA NGAY
                 </button>
@@ -202,6 +209,20 @@ function openFullscreen(imgElement) {
     fullscreenImg.style.maxHeight = '90%';
     fullscreenDiv.appendChild(fullscreenImg);
     document.body.appendChild(fullscreenDiv);
+}
+
+const quantityInput = document.getElementById('quantity-product');
+const quantityFields = document.querySelectorAll('.quantity-sync');
+
+if (quantityInput) {
+    const syncQuantity = function () {
+        quantityFields.forEach(function (field) {
+            field.value = quantityInput.value;
+        });
+    };
+
+    quantityInput.addEventListener('input', syncQuantity);
+    syncQuantity();
 }
 </script>
 @endsection

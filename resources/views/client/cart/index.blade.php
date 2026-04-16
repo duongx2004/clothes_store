@@ -23,7 +23,21 @@
                     </td>
                     <td>{{ $item['name'] }}</td>
                     <td>{{ number_format($item['price']) }} VNĐ</td>
-                    <td>{{ $item['quantity'] }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <form action="{{ route('cart.update', $id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="action" value="decrease">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm" {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>-</button>
+                            </form>
+                            <span class="fw-semibold">{{ $item['quantity'] }}</span>
+                            <form action="{{ route('cart.update', $id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="action" value="increase">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">+</button>
+                            </form>
+                        </div>
+                    </td>
                     <td>{{ number_format($subtotal) }} VNĐ</td>
                     <td>
                         <form action="{{ route('cart.remove', $id) }}" method="POST">
