@@ -117,7 +117,6 @@
 @endpush
 
 @section('content')
-<<<<<<< HEAD
 <h1>Giỏ hàng</h1>
 @if(empty($cart))
     <div class="alert alert-info">Giỏ hàng trống.</div>
@@ -184,85 +183,4 @@
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
 @endif
-=======
-<section class="cart-page">
-    <h1 class="cart-title">Giỏ hàng</h1>
-
-    @if(empty($cart))
-        <div class="alert empty-cart">Giỏ hàng trống.</div>
-    @else
-        <div class="cart-panel">
-            <div class="cart-table-wrap">
-                <table class="table cart-table">
-                    <thead>
-                        <tr>
-                            <th>Hình ảnh</th>
-                            <th>Sản phẩm</th>
-                            <th>Giá</th>
-                            <th>Số lượng</th>
-                            <th>Thành tiền</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php $total = 0; @endphp
-                        @foreach($cart as $id => $item)
-                            @php $subtotal = $item['price'] * $item['quantity']; $total += $subtotal; @endphp
-                            <tr>
-                                <td>
-                                    @if(!empty($item['image']))
-                                        <img src="{{ asset('images/products/'.$item['image']) }}" class="cart-thumb" alt="{{ $item['name'] }}">
-                                    @else
-                                        <img src="https://via.placeholder.com/72" class="cart-thumb" alt="{{ $item['name'] }}">
-                                    @endif
-                                </td>
-                                <td class="fw-semibold">{{ $item['name'] }}</td>
-                                <td>{{ number_format($item['price']) }} VNĐ</td>
-                                <td>
-                                    <div class="qty-box">
-                                        <form action="{{ route('cart.update', $id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="action" value="decrease">
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm" {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>-</button>
-                                        </form>
-                                        <span class="fw-semibold">{{ $item['quantity'] }}</span>
-                                        <form action="{{ route('cart.update', $id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="action" value="increase">
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm">+</button>
-                                        </form>
-                                    </div>
-                                </td>
-                                <td class="fw-semibold">{{ number_format($subtotal) }} VNĐ</td>
-                                <td>
-                                    <form action="{{ route('cart.remove', $id) }}" method="POST">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-outline-danger btn-sm">Xóa</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                        <tr class="table-active">
-                            <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
-                            <td class="fw-bold">{{ number_format($total) }} VNĐ</td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="cart-panel checkout-form">
-            <form action="{{ route('checkout') }}" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label class="form-label">Địa chỉ giao hàng</label>
-                    <textarea name="address" class="form-control" rows="3" required placeholder="Nhập địa chỉ giao hàng chi tiết..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary checkout-btn">Thanh toán</button>
-            </form>
-        </div>
-    @endif
-</section>
->>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
 @endsection

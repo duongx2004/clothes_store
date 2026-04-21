@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -18,19 +20,23 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.products.create', compact('categories'));
+        $brands = Brand::all();
+        return view('admin.products.create', compact('categories', 'brands'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:products',
-            'description' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|unique:products',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'discount_percent' => 'nullable|integer|min:0|max:100',
+            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'brand_id' => 'nullable|exists:brands,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = $request->all();
@@ -41,6 +47,13 @@ class ProductController extends Controller
             $data['image'] = $filename;
         }
 
+        // Xử lý giá khuyến mãi
+        if ($request->filled('sale_price')) {
+            $data['discount_percent'] = null;
+        } elseif ($request->filled('discount_percent')) {
+            $data['sale_price'] = null;
+        }
+
         Product::create($data);
         return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công');
     }
@@ -49,20 +62,25 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $categories = Category::all();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $brands = Brand::all();
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+
         $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:products,slug,' . $id,
-            'description' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|unique:products,slug,' . $id,
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'discount_percent' => 'nullable|integer|min:0|max:100',
+            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'brand_id' => 'nullable|exists:brands,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = $request->all();
@@ -74,6 +92,13 @@ class ProductController extends Controller
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/products'), $filename);
             $data['image'] = $filename;
+        }
+
+        // Xử lý giá khuyến mãi
+        if ($request->filled('sale_price')) {
+            $data['discount_percent'] = null;
+        } elseif ($request->filled('discount_percent')) {
+            $data['sale_price'] = null;
         }
 
         $product->update($data);

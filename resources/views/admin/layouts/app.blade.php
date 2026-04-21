@@ -32,6 +32,16 @@
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('admin.revenue.index') }}">
+                                    <i class="bi bi-graph-up"></i> Doanh thu
+                                </a>
+                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.users.index') }}">
+                                <i class="bi bi-people"></i> Tài khoản
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.products.index') }}">
                                 <i class="bi bi-box"></i> Sản phẩm

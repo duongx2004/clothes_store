@@ -96,7 +96,6 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống');
         }
 
-<<<<<<< HEAD
         // Kiểm tra tồn kho trước khi tạo đơn
         foreach ($cart as $id => $item) {
             $product = Product::find($id);
@@ -105,17 +104,6 @@ class CartController extends Controller
             }
             if ($product->stock < $item['quantity']) {
                 return redirect()->route('cart.index')->with('error', "Sản phẩm {$product->name} chỉ còn {$product->stock} sản phẩm.");
-=======
-        foreach ($cart as $id => $item) {
-            $product = Product::find($id);
-
-            if (!$product) {
-                return redirect()->route('cart.index')->with('error', 'Có sản phẩm không còn tồn tại trong hệ thống');
-            }
-
-            if ($item['quantity'] > $product->stock) {
-                return redirect()->route('cart.index')->with('error', 'Có sản phẩm vượt quá số lượng tồn kho hiện tại');
->>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
             }
         }
 

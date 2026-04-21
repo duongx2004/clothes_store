@@ -21,6 +21,17 @@
         <input type="number" name="price" class="form-control" step="1000" required>
     </div>
     <div class="mb-3">
+        <label class="form-label">Giá khuyến mãi (VNĐ)</label>
+        <input type="number" name="sale_price" class="form-control" value="{{ old('sale_price', $product->sale_price ?? '') }}" step="1000">
+        <small class="text-muted">Để trống nếu không giảm giá.</small>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Phần trăm giảm (%)</label>
+        <input type="number" name="discount_percent" class="form-control" value="{{ old('discount_percent', $product->discount_percent ?? '') }}" min="0" max="100">
+        <small class="text-muted">Ưu tiên: nếu có giá khuyến mãi, sẽ dùng giá đó; nếu không thì tính theo %.</small>
+    </div>
+    <div class="mb-3">
         <label class="form-label">Tồn kho</label>
         <input type="number" name="stock" class="form-control" required>
     </div>

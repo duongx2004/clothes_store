@@ -205,11 +205,35 @@
         margin-bottom: 4px;
     }
 
-    .price {
+    /* === Giá và giảm giá === */
+    .price-wrapper {
+        margin-top: 8px;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+        margin-right: 8px;
+    }
+    .sale-price {
+        color: #d9534f;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .discount-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 20px;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-left: 8px;
+        display: inline-block;
+    }
+    .price-only {
         color: #1a1a1a;
         font-weight: bold;
         font-size: 1.1rem;
-        margin-top: 8px;
     }
 
     .no-results {
@@ -359,7 +383,33 @@
                         <h3 class="product-title">{{ $product->name }}</h3>
                         <div class="brand">Hãng: {{ $product->brand->name ?? 'Chưa có' }}</div>
                         <div class="category">Danh mục: {{ $product->category->name ?? 'Chưa có' }}</div>
-                        <div class="price">{{ number_format($product->price, 0, ',', '.') }}₫</div>
+
+                        {{-- Hiển thị giá có giảm giá hoặc không --}}
+                        @php
+                            $hasSale = !is_null($product->sale_price) && $product->sale_price > 0;
+                            $hasDiscountPercent = !is_null($product->discount_percent) && $product->discount_percent > 0;
+                            $salePrice = null;
+                            $percent = 0;
+                            if ($hasSale) {
+                                $salePrice = $product->sale_price;
+                                $percent = round((1 - $salePrice / $product->price) * 100);
+                            } elseif ($hasDiscountPercent) {
+                                $salePrice = $product->price * (1 - $product->discount_percent / 100);
+                                $percent = $product->discount_percent;
+                            }
+                        @endphp
+
+                        @if($salePrice && $salePrice < $product->price)
+                            <div class="price-wrapper">
+                                <span class="original-price">{{ number_format($product->price, 0, ',', '.') }}₫</span>
+                                <span class="sale-price">{{ number_format($salePrice, 0, ',', '.') }}₫</span>
+                                <span class="discount-badge">-{{ $percent }}%</span>
+                            </div>
+                        @else
+                            <div class="price-wrapper">
+                                <span class="price-only">{{ number_format($product->price, 0, ',', '.') }}₫</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </a>
