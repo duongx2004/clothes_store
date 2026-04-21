@@ -1,190 +1,190 @@
 @extends('layouts.app')
 @section('title', $product->name)
-@section('content')
+@push('styles')
 <style>
-    .main-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
+    .product-show-page {
+        --text-main: #1a1a1a;
+        --text-soft: #575757;
+        --line: #e6e6e6;
+        --panel: #f6f6f6;
+        color: var(--text-main);
     }
-    .product-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 40px 0;
-        width: 75%;
-    }
-    .product-left img {
-        width: 300px;
-        height: auto;
-        border: 2px solid #f85639;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease;
-        cursor: pointer;
-    }
-    .product-right {
-        padding-left: 30px;
-        text-align: left;
-        margin-right: 100px;
-    }
-    .product-right h2 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-        color: rgb(0, 116, 211);
-    }
-    .product-right button {
-        flex-grow: 1;
-        margin: 0 0 8px 8px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-    .product-right button:hover {
-        background-color: rgba(248, 86, 57, 0.8);
-        transform: scale(1.05);
-    }
-    .product-related {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 40px 0;
-    }
-    .product-related .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-        color: rgb(0, 116, 211);
-    }
-    .product-grid {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        padding: 0 29px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-    }
-    .product-link {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-    }
-    .product-card {
-        width: 235px;
-        height: 250px;
-        display: flex;
-        flex-direction: column;
+
+    .product-shell {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 1.4rem;
         background: #fff;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease;
-        box-sizing: border-box;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        padding: 1.35rem;
+        animation: riseIn 0.7s ease both;
     }
-    .product-card:hover {
-        transform: translateY(-2px);
-    }
-    .product-image {
-        width: 100%;
-        height: 150px;
-        overflow: hidden;
-        background: #f8f9fa;
-    }
-    .product-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        object-position: center;
-        display: block;
-    }
-    .product-details {
-        flex-grow: 1;
-        padding: 0.75rem;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    .product-title {
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .brand-category {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.85rem;
-        color: #666;
-        margin-bottom: 0.5rem;
-    }
-    .price-container {
+
+    .product-left {
+        background: var(--panel);
+        border: 1px solid #ececec;
+        border-radius: 16px;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: center;
+        min-height: 380px;
+        padding: 1rem;
     }
-    .original-price {
-        text-decoration: line-through;
-        color: #999;
-        font-size: 0.9rem;
+
+    .product-left img {
+        max-width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+        cursor: zoom-in;
+        transition: transform 0.3s ease;
     }
-    .discount-price {
-        color: #e74c3c;
-        font-weight: bold;
-        font-size: 1.1rem;
+
+    .product-left img:hover {
+        transform: scale(1.02);
     }
-    .no-results {
-        text-align: center;
-        padding: 2rem;
-        color: #666;
+
+    .product-right h1 {
+        font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+        margin-bottom: 0.8rem;
+    }
+
+    .product-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .product-meta div {
+        border: 1px solid #ebebeb;
+        background: #fafafa;
+        border-radius: 10px;
+        padding: 0.6rem 0.75rem;
+        color: var(--text-soft);
+        font-size: 0.92rem;
+    }
+
+    .product-price {
+        font-size: 1.55rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .product-description {
+        color: var(--text-soft);
+        line-height: 1.75;
+        margin-bottom: 1rem;
+    }
+
+    .quantity-box {
+        max-width: 160px;
+        margin-bottom: 0.95rem;
+    }
+
+    .quantity-box .form-control:focus {
+        border-color: #b8947b;
+        box-shadow: 0 0 0 4px rgba(232, 212, 192, 0.35);
+    }
+
+    .product-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .product-actions button {
+        border-radius: 10px;
+        min-width: 180px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 16px rgba(0, 0, 0, 0.14);
+    }
+
+    @keyframes riseIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 991px) {
+        .product-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .product-left {
+            min-height: 300px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .product-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .product-actions button {
+            width: 100%;
+        }
     }
 </style>
+@endpush
 
-<div class="main-container">
-    <div class="product-container">
+@section('content')
+
+<section class="product-show-page">
+    <div class="product-shell">
         <div class="product-left">
             <img src="{{ $product->image ? asset('images/products/'.$product->image) : 'https://via.placeholder.com/300' }}" 
                  onclick="openFullscreen(this)" alt="{{ $product->name }}">
         </div>
         <div class="product-right">
-            <h2>{{ $product->name }}</h2>
-            <p><strong>Thương hiệu:</strong> {{ $product->brand->name ?? 'Chưa xác định' }}</p>
-            <p><strong>Danh mục:</strong> {{ $product->category->name ?? 'Chưa phân loại' }}</p>
-            <p><strong>Giá:</strong> {{ number_format($product->price, 0, ',', '.') }}₫</p>
-            <p><strong>Tồn kho:</strong> {{ $product->stock }}</p>
-            <p>{{ $product->description }}</p>
+            <h1>{{ $product->name }}</h1>
 
-            <div class="mb-3" style="max-width: 140px;">
+            <div class="product-meta">
+                <div><strong>Thương hiệu:</strong> {{ $product->brand->name ?? 'Chưa xác định' }}</div>
+                <div><strong>Danh mục:</strong> {{ $product->category->name ?? 'Chưa phân loại' }}</div>
+                <div><strong>Tồn kho:</strong> {{ $product->stock }}</div>
+                <div><strong>Mã sản phẩm:</strong> #{{ $product->id }}</div>
+            </div>
+
+            <div class="product-price">{{ number_format($product->price, 0, ',', '.') }}₫</div>
+            <p class="product-description">{{ $product->description }}</p>
+
+            <div class="quantity-box">
                 <label for="quantity-product" class="form-label">Số lượng</label>
                 <input id="quantity-product" type="number" class="form-control" min="1" max="{{ $product->stock }}" value="1" {{ $product->stock < 1 ? 'disabled' : '' }}>
             </div>
 
-            {{-- Form THÊM VÀO GIỎ HÀNG --}}
-            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" name="quantity" value="1" class="quantity-sync">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG
-                </button>
-            </form>
+            <div class="product-actions">
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="quantity" value="1" class="quantity-sync">
+                    <button type="submit" class="btn btn-dark">
+                        <i class="bi bi-cart d-inline-block mx-1"></i>THÊM VÀO GIỎ HÀNG
+                    </button>
+                </form>
 
-            {{-- Form MUA NGAY (thêm hidden field để controller biết) --}}
-            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" name="buy_now" value="1">
-                <input type="hidden" name="quantity" value="1" class="quantity-sync">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-wallet2"></i> MUA NGAY
-                </button>
-            </form>
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="buy_now" value="1">
+                    <input type="hidden" name="quantity" value="1" class="quantity-sync">
+                    <button type="submit" class="btn btn-outline-dark">
+                        <i class="bi bi-wallet2"></i> MUA NGAY
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-
-    {{-- Sản phẩm cùng loại (bỏ comment nếu có biến $relatedProducts) --}}
-    {{-- <div class="product-related"> ... </div> --}}
-</div>
+</section>
 
 <script>
 // Hàm phóng to ảnh (giữ lại vì là tiện ích, không liên quan logic Laravel)
