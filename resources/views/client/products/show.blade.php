@@ -155,32 +155,48 @@
             <p><strong>Giá:</strong> {{ number_format($product->price, 0, ',', '.') }}₫</p>
             <p><strong>Tồn kho:</strong> {{ $product->stock }}</p>
             <p>{{ $product->description }}</p>
-
-            {{-- Form THÊM VÀO GIỎ HÀNG --}}
             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
                 @csrf
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG
-                </button>
+                <button type="submit" class="btn btn-success"><i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG</button>
             </form>
-
-            {{-- Form MUA NGAY (thêm hidden field để controller biết) --}}
-            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" name="buy_now" value="1">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-wallet2"></i> MUA NGAY
-                </button>
-            </form>
+            <a href="{{ route('cart.index') }}" class="btn btn-primary"> MUA NGAY</a>
         </div>
     </div>
 
-    {{-- Sản phẩm cùng loại (bỏ comment nếu có biến $relatedProducts) --}}
-    {{-- <div class="product-related"> ... </div> --}}
+    <div class="product-related">
+        <h2 class="section-title mb-4">Sản phẩm cùng loại</h2>
+        <div class="product-grid">
+            @forelse($relatedProducts as $related)
+                <a href="{{ route('products.show', $related->slug) }}" class="product-link">
+                    <div class="product-card">
+                        <div class="product-image">
+                            @if($related->image)
+                                <img src="{{ asset('images/products/'.$related->image) }}" alt="{{ $related->name }}">
+                            @else
+                                <img src="https://via.placeholder.com/235" alt="No Image">
+                            @endif
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">{{ $related->name }}</h3>
+                            <div class="brand-category">
+                                <span class="brand">{{ $related->brand->name ?? 'Chưa có thương hiệu' }}</span>
+                                <span class="category">{{ $related->category->name ?? 'Chưa có danh mục' }}</span>
+                            </div>
+                            <div class="price-container">
+                                <span class="original-price">{{ number_format($related->price * 1.5, 0, ',', '.') }}₫</span>
+                                <span class="discount-price">{{ number_format($related->price, 0, ',', '.') }}₫</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            @empty
+                <div class="no-results">Không tìm thấy sản phẩm nào cùng loại</div>
+            @endforelse
+        </div>
+    </div>
 </div>
 
 <script>
-// Hàm phóng to ảnh (giữ lại vì là tiện ích, không liên quan logic Laravel)
 function openFullscreen(imgElement) {
     var fullscreenDiv = document.createElement('div');
     fullscreenDiv.style.position = 'fixed';

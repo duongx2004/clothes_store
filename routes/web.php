@@ -6,27 +6,28 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
-// Trang chủ
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Sản phẩm (client)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/search-suggestions', [ProductController::class, 'suggestions'])->name('search.suggestions');
 
-// Giỏ hàng, thanh toán...
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
 
-// Các trang tĩnh
 Route::view('/contact', 'client.contact')->name('contact');
 Route::view('/about', 'client.about')->name('about');
 
-// Yêu cầu đăng nhập
+Route::get('/thanks', function () {
+return view('client.thanks');
+})->name('thanks');
+Route::get('/vnpay-return', [PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/my-orders', function () {
         $orders = auth()->user()->orders()->with('items.product')->get();
@@ -38,7 +39,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/change-password', [ChangePasswordController::class, 'update'])->name('change.password.update');
 });
 
-// Admin routes (giữ nguyên)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');

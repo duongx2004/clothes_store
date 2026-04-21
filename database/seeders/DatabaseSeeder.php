@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $category = Category::create(['name' => 'Áo thun', 'slug' => 'ao-thun']);
-        $brand = Brand::create(['name' => 'ThugShaker', 'slug' => 'thug-saker']);
+        $brandThug = Brand::create(['name' => 'ThugShaker', 'slug' => 'thug-saker']);
+        $brandNavi = Brand::create(['name' => 'Natus Vincere', 'slug' => 'natus-vincere']);
 
         Product::create([
             'name' => 'Áo My NIGGA',
@@ -36,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'stock' => 10,
             'image' => 'my-nigga.jpg',
             'category_id' => $category->id,
-            'brand_id' => $brand->id,
+            'brand_id' => $brandThug->id,
         ]);
         Product::create([
             'name' => 'Áo Phông Natus Vincere',
@@ -46,7 +47,7 @@ class DatabaseSeeder extends Seeder
             'stock' => 5,
             'image' => 'ao-navi.jpg',
             'category_id' => $category->id,
-            'brand_id' => $brand->id,
+            'brand_id' => $brandNavi->id,
         ]);
     }
 }

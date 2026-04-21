@@ -24,9 +24,8 @@ class AuthenticatedSessionController extends Controller
 
         // Kiểm tra role để chuyển hướng
         if (auth()->user()->isAdmin()) {
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
+        return redirect()->intended(route('admin.dashboard'));
+    }
         return redirect()->intended(route('home'));
     }
 

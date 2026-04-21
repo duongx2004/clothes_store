@@ -40,12 +40,30 @@
             </tr>
         </tbody>
     </table>
+
     <form action="{{ route('checkout') }}" method="POST">
         @csrf
+        <div class="mb-3">
+            <label class="form-label">Phương thức thanh toán</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="cod" checked>
+                <label class="form-check-label" for="payment_cod">
+                    Thanh toán khi nhận hàng (COD)
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" id="payment_vnpay" value="vnpay">
+                <label class="form-check-label" for="payment_vnpay">
+                    Thanh toán qua VNPay (Thẻ ATM/Visa/Master/JCB)
+                </label>
+            </div>
+        </div>
+
         <div class="mb-3">
             <label class="form-label">Địa chỉ giao hàng</label>
             <textarea name="address" class="form-control" rows="2" required></textarea>
         </div>
+
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
 @endif
