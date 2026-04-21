@@ -21,15 +21,21 @@ class CartController extends Controller
     {
         $product = Product::findOrFail($id);
         $cart = session()->get('cart', []);
+        $quantity = max(1, (int) $request->input('quantity', 1));
+
+        if ($product->stock < 1) {
+            return back()->with('error', 'Sản phẩm này đã hết hàng');
+        }
 
         if (isset($cart[$id])) {
-            $cart[$id]['quantity']++;
+            $newQuantity = $cart[$id]['quantity'] + $quantity;
+            $cart[$id]['quantity'] = min($newQuantity, $product->stock);
         } else {
             $cart[$id] = [
                 'name' => $product->name,
                 'price' => $product->price,
                 'image' => $product->image,
-                'quantity' => 1,
+                'quantity' => min($quantity, $product->stock),
             ];
         }
         session()->put('cart', $cart);
@@ -38,6 +44,37 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm, vui lòng kiểm tra giỏ hàng.');
         }
         return back()->with('success', 'Đã thêm vào giỏ hàng');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $cart = session()->get('cart', []);
+
+        if (!isset($cart[$id])) {
+            return redirect()->route('cart.index')->with('error', 'Sản phẩm không tồn tại trong giỏ hàng');
+        }
+
+        $action = $request->input('action');
+        $quantity = (int) ($cart[$id]['quantity'] ?? 0);
+
+        if ($action === 'increase') {
+            if ($quantity >= $product->stock) {
+                return redirect()->route('cart.index')->with('error', 'Số lượng đã đạt mức tồn kho hiện có');
+            }
+
+            $cart[$id]['quantity'] = $quantity + 1;
+        } elseif ($action === 'decrease') {
+            if ($quantity <= 1) {
+                return redirect()->route('cart.index')->with('error', 'Số lượng tối thiểu là 1');
+            }
+
+            $cart[$id]['quantity'] = $quantity - 1;
+        }
+
+        session()->put('cart', $cart);
+
+        return redirect()->route('cart.index')->with('success', 'Đã cập nhật số lượng');
     }
 
     public function remove($id)
@@ -59,6 +96,7 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống');
         }
 
+<<<<<<< HEAD
         // Kiểm tra tồn kho trước khi tạo đơn
         foreach ($cart as $id => $item) {
             $product = Product::find($id);
@@ -67,6 +105,17 @@ class CartController extends Controller
             }
             if ($product->stock < $item['quantity']) {
                 return redirect()->route('cart.index')->with('error', "Sản phẩm {$product->name} chỉ còn {$product->stock} sản phẩm.");
+=======
+        foreach ($cart as $id => $item) {
+            $product = Product::find($id);
+
+            if (!$product) {
+                return redirect()->route('cart.index')->with('error', 'Có sản phẩm không còn tồn tại trong hệ thống');
+            }
+
+            if ($item['quantity'] > $product->stock) {
+                return redirect()->route('cart.index')->with('error', 'Có sản phẩm vượt quá số lượng tồn kho hiện tại');
+>>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
             }
         }
 

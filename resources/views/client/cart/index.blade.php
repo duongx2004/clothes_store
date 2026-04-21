@@ -1,6 +1,123 @@
 @extends('layouts.app')
 @section('title', 'Giỏ hàng')
+
+@push('styles')
+<style>
+    .cart-page {
+        --text-main: #1a1a1a;
+        --text-soft: #595959;
+        --line: #e6e6e6;
+        --panel: #f7f7f7;
+        color: var(--text-main);
+    }
+
+    .cart-panel {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+        padding: 1.2rem;
+        margin-bottom: 1.2rem;
+        animation: riseIn 0.65s ease both;
+    }
+
+    .cart-title {
+        font-size: clamp(1.6rem, 2.3vw, 2.2rem);
+        margin-bottom: 1rem;
+    }
+
+    .cart-table-wrap {
+        overflow-x: auto;
+    }
+
+    .cart-table {
+        min-width: 860px;
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .cart-table thead th {
+        background: #f4f4f4;
+        color: #3d3d3d;
+        border-bottom: 1px solid #dbdbdb;
+        white-space: nowrap;
+    }
+
+    .cart-thumb {
+        width: 72px;
+        height: 72px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid #e7e7e7;
+        background: #f8f8f8;
+    }
+
+    .qty-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border: 1px solid #e4e4e4;
+        border-radius: 999px;
+        padding: 0.25rem 0.45rem;
+        background: var(--panel);
+    }
+
+    .qty-box .btn {
+        border-radius: 999px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .checkout-form .form-control:focus {
+        border-color: #b8947b;
+        box-shadow: 0 0 0 4px rgba(232, 212, 192, 0.35);
+    }
+
+    .checkout-btn {
+        background: #1a1a1a;
+        border-color: #1a1a1a;
+        border-radius: 10px;
+        padding: 0.55rem 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .checkout-btn:hover {
+        background: #000;
+        border-color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.14);
+    }
+
+    .empty-cart {
+        border: 1px dashed #d8d8d8;
+        background: #fff;
+        border-radius: 14px;
+        color: var(--text-soft);
+    }
+
+    @keyframes riseIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .cart-panel {
+            padding: 1rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
+<<<<<<< HEAD
 <h1>Giỏ hàng</h1>
 @if(empty($cart))
     <div class="alert alert-info">Giỏ hàng trống.</div>
@@ -67,4 +184,85 @@
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
 @endif
+=======
+<section class="cart-page">
+    <h1 class="cart-title">Giỏ hàng</h1>
+
+    @if(empty($cart))
+        <div class="alert empty-cart">Giỏ hàng trống.</div>
+    @else
+        <div class="cart-panel">
+            <div class="cart-table-wrap">
+                <table class="table cart-table">
+                    <thead>
+                        <tr>
+                            <th>Hình ảnh</th>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $total = 0; @endphp
+                        @foreach($cart as $id => $item)
+                            @php $subtotal = $item['price'] * $item['quantity']; $total += $subtotal; @endphp
+                            <tr>
+                                <td>
+                                    @if(!empty($item['image']))
+                                        <img src="{{ asset('images/products/'.$item['image']) }}" class="cart-thumb" alt="{{ $item['name'] }}">
+                                    @else
+                                        <img src="https://via.placeholder.com/72" class="cart-thumb" alt="{{ $item['name'] }}">
+                                    @endif
+                                </td>
+                                <td class="fw-semibold">{{ $item['name'] }}</td>
+                                <td>{{ number_format($item['price']) }} VNĐ</td>
+                                <td>
+                                    <div class="qty-box">
+                                        <form action="{{ route('cart.update', $id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm" {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>-</button>
+                                        </form>
+                                        <span class="fw-semibold">{{ $item['quantity'] }}</span>
+                                        <form action="{{ route('cart.update', $id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm">+</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td class="fw-semibold">{{ number_format($subtotal) }} VNĐ</td>
+                                <td>
+                                    <form action="{{ route('cart.remove', $id) }}" method="POST">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-outline-danger btn-sm">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                        <tr class="table-active">
+                            <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
+                            <td class="fw-bold">{{ number_format($total) }} VNĐ</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="cart-panel checkout-form">
+            <form action="{{ route('checkout') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label">Địa chỉ giao hàng</label>
+                    <textarea name="address" class="form-control" rows="3" required placeholder="Nhập địa chỉ giao hàng chi tiết..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary checkout-btn">Thanh toán</button>
+            </form>
+        </div>
+    @endif
+</section>
+>>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
 @endsection

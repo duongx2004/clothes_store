@@ -13,6 +13,7 @@ class ProductController extends Controller
     {
         $query = Product::with(['category', 'brand']);
 
+<<<<<<< HEAD
         // Filter by category
         if ($request->filled('category')) {
             $query->whereHas('category', function($q) use ($request) {
@@ -31,10 +32,35 @@ class ProductController extends Controller
         if ($request->filled('price_min')) {
             $query->where('price', '>=', $request->price_min);
         }
+=======
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        } elseif ($request->filled('brand')) {
+            $query->whereHas('brand', function ($brandQuery) use ($request) {
+                $brandQuery->where('name', $request->brand);
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->whereHas('category', function ($categoryQuery) use ($request) {
+                $categoryQuery->where('name', $request->category);
+            });
+        }
+
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', $request->price_min);
+        }
+
+>>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
         if ($request->filled('price_max')) {
             $query->where('price', '<=', $request->price_max);
         }
 
+<<<<<<< HEAD
         // Search by product name
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -53,6 +79,21 @@ class ProductController extends Controller
                 $query->join('categories', 'products.category_id', '=', 'categories.id')
                       ->orderBy('categories.name', $sortOrder)
                       ->select('products.*');
+=======
+        $sortBy = $request->get('sort_by', 'name');
+        $sortOrder = $request->get('sort_order', 'asc');
+        $allowedSorts = ['name', 'price', 'brand_name', 'category_name'];
+
+        if (in_array($sortBy, $allowedSorts, true)) {
+            if ($sortBy === 'brand_name') {
+                $query->join('brands', 'products.brand_id', '=', 'brands.id')
+                    ->orderBy('brands.name', $sortOrder)
+                    ->select('products.*');
+            } elseif ($sortBy === 'category_name') {
+                $query->join('categories', 'products.category_id', '=', 'categories.id')
+                    ->orderBy('categories.name', $sortOrder)
+                    ->select('products.*');
+>>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
             } else {
                 $query->orderBy($sortBy, $sortOrder);
             }
@@ -61,8 +102,11 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(9)->appends($request->query());
+<<<<<<< HEAD
 
         // Get distinct brands and categories for filter dropdowns
+=======
+>>>>>>> 1e05f062b1a77963a838c2c5bc47506197b5379d
         $brands = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
 
