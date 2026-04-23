@@ -44,12 +44,12 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{id}/edit', [OrderController::class, 'edit'])->name('orders.edit');
-    Route::put('/orders/{id}', [OrderController::class, 'update'])->name('orders.update');
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::get('/revenue', [\App\Http\Controllers\Admin\RevenueController::class, 'index'])->name('revenue.index');
+    Route::resource('brands', \App\Http\Controllers\Admin\BrandController::class);
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 });
 
 require __DIR__.'/auth.php';

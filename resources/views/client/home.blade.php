@@ -157,6 +157,31 @@
         font-weight: 700;
     }
 
+    .price-wrapper {
+        margin: 0.5rem 0;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.85rem;
+        margin-right: 8px;
+    }
+    .sale-price {
+        color: #d9534f;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    .discount-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 20px;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-left: 8px;
+        display: inline-block;
+    }
+
     .home-features {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -229,23 +254,35 @@
 
 @section('content')
 @php
-    $bannerImages = glob(public_path('images/banner/*.{jpg,jpeg,png,webp,avif}'), GLOB_BRACE);
+    // Lấy danh sách ảnh banner từ thư mục public/images/banner (hỗ trợ nhiều định dạng)
+    $bannerFiles = [];
+    $bannerDir = public_path('images/banner');
+    if (is_dir($bannerDir)) {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'avif'];
+        foreach (scandir($bannerDir) as $file) {
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if (in_array($ext, $allowedExtensions)) {
+                $bannerFiles[] = $file;
+            }
+        }
+        sort($bannerFiles); // sắp xếp theo tên
+    }
 @endphp
 <section class="home-page">
-    @if(!empty($bannerImages))
+    @if(!empty($bannerFiles))
     <section class="home-panel">
         <div id="homeBannerCarousel" class="carousel slide carousel-fade home-banner" data-bs-ride="carousel" data-bs-interval="2800" data-bs-pause="hover">
             <div class="carousel-indicators">
-                @foreach($bannerImages as $index => $imagePath)
+                @foreach($bannerFiles as $index => $file)
                     <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
                 @endforeach
             </div>
 
             <div class="carousel-inner">
-                @foreach($bannerImages as $index => $imagePath)
+                @foreach($bannerFiles as $index => $file)
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                         <a href="{{ route('products.index') }}">
-                            <img src="{{ asset('images/banner/' . basename($imagePath)) }}" alt="Banner {{ $index + 1 }}" loading="lazy">
+                            <img src="{{ asset('images/banner/' . $file) }}" alt="Banner {{ $index + 1 }}" loading="lazy">
                         </a>
                         <div class="carousel-caption d-none d-md-block">
                             <h5 class="mb-1">Bộ sưu tập nổi bật</h5>
@@ -284,13 +321,34 @@
 
         <div class="home-products">
             @foreach($featuredProducts as $product)
+            @php
+                $hasSale = !is_null($product->sale_price) && $product->sale_price > 0;
+                $hasDiscountPercent = !is_null($product->discount_percent) && $product->discount_percent > 0;
+                $salePrice = null;
+                $percent = 0;
+                if ($hasSale) {
+                    $salePrice = $product->sale_price;
+                    $percent = round((1 - $salePrice / $product->price) * 100);
+                } elseif ($hasDiscountPercent) {
+                    $salePrice = $product->price * (1 - $product->discount_percent / 100);
+                    $percent = $product->discount_percent;
+                }
+            @endphp
             <a href="{{ route('products.show', $product->slug) }}" class="home-product-card" aria-label="Xem chi tiết {{ $product->name }}">
                 <div class="home-product-image">
                     <img src="{{ $product->image ? asset('images/products/'.$product->image) : 'https://via.placeholder.com/300' }}" alt="{{ $product->name }}" loading="lazy">
                 </div>
                 <div class="home-product-body">
                     <h3 class="home-product-title">{{ $product->name }}</h3>
-                    <p class="home-product-price">{{ number_format($product->price, 0, ',', '.') }}₫</p>
+                    @if($salePrice && $salePrice < $product->price)
+                        <div class="price-wrapper">
+                            <span class="original-price">{{ number_format($product->price, 0, ',', '.') }}₫</span>
+                            <span class="sale-price">{{ number_format($salePrice, 0, ',', '.') }}₫</span>
+                            <span class="discount-badge">-{{ $percent }}%</span>
+                        </div>
+                    @else
+                        <p class="home-product-price">{{ number_format($product->price, 0, ',', '.') }}₫</p>
+                    @endif
                     <span class="home-btn home-btn-secondary">Xem chi tiết</span>
                 </div>
             </a>

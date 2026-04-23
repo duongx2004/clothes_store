@@ -49,7 +49,7 @@
 
 @section('content')
 <div class="container-fluid px-4">
-    <!-- Thống kê nhanh - 4 cột đều nhau, có link -->
+    <!-- Hàng 1: Thống kê chính -->
     <div class="row g-4 mb-4">
         <div class="col-md-3 col-sm-6">
             <a href="{{ route('admin.products.index') }}" class="text-decoration-none">
@@ -97,7 +97,44 @@
         </div>
     </div>
 
-    <!-- Biểu đồ doanh thu + Đơn hàng gần đây - cân bằng 2 cột -->
+    <!-- Hàng 2: Thống kê bổ sung (Brand, Category, đơn hàng pending) -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4 col-sm-6">
+            <a href="{{ route('admin.brands.index') }}" class="text-decoration-none">
+                <div class="card stat-card bg-info text-white h-100">
+                    <div class="card-body position-relative">
+                        <div class="stat-icon"><i class="bi bi-tags"></i></div>
+                        <h6 class="card-title text-uppercase fw-semibold">Thương hiệu</h6>
+                        <h2 class="mt-2 mb-0">{{ number_format($totalBrands) }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <a href="{{ route('admin.categories.index') }}" class="text-decoration-none">
+                <div class="card stat-card bg-secondary text-white h-100">
+                    <div class="card-body position-relative">
+                        <div class="stat-icon"><i class="bi bi-folder"></i></div>
+                        <h6 class="card-title text-uppercase fw-semibold">Danh mục</h6>
+                        <h2 class="mt-2 mb-0">{{ number_format($totalCategories) }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="text-decoration-none">
+                <div class="card stat-card bg-warning text-white h-100">
+                    <div class="card-body position-relative">
+                        <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                        <h6 class="card-title text-uppercase fw-semibold">Đơn chờ xử lý</h6>
+                        <h2 class="mt-2 mb-0">{{ number_format($pendingOrders) }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Biểu đồ doanh thu + Đơn hàng gần đây -->
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card h-100">

@@ -43,6 +43,16 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}" href="{{ route('admin.brands.index') }}">
+                                <i class="bi bi-tags"></i> Thương hiệu
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                                <i class="bi bi-folder"></i> Danh mục
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.products.index') }}">
                                 <i class="bi bi-box"></i> Sản phẩm
                             </a>
