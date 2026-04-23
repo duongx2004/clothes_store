@@ -128,7 +128,12 @@
         <tbody>
             @php $total = 0; @endphp
             @foreach($cart as $id => $item)
-                @php $subtotal = $item['price'] * $item['quantity']; $total += $subtotal; @endphp
+                @php 
+                    $subtotal = $item['price'] * $item['quantity']; 
+                    $total += $subtotal;
+                    $product = \App\Models\Product::find($id);
+                    $stock = $product ? $product->stock : 0;
+                @endphp
                 <tr>
                     <td>
                         @if(!empty($item['image']))
@@ -139,7 +144,23 @@
                     </td>
                     <td>{{ $item['name'] }}</td>
                     <td>{{ number_format($item['price']) }} VNĐ</td>
-                    <td>{{ $item['quantity'] }}</td>
+                    <td>
+                        <div class="qty-box">
+                            <form action="{{ route('cart.update', $id) }}" method="POST" style="display: inline;">
+                                @csrf
+                                <input type="hidden" name="action" value="decrease">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                    {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>−</button>
+                            </form>
+                            <span style="min-width: 30px; text-align: center;">{{ $item['quantity'] }}</span>
+                            <form action="{{ route('cart.update', $id) }}" method="POST" style="display: inline;">
+                                @csrf
+                                <input type="hidden" name="action" value="increase">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                    {{ $item['quantity'] >= $stock ? 'disabled' : '' }}>+</button>
+                            </form>
+                        </div>
+                    </td>
                     <td>{{ number_format($subtotal) }} VNĐ</td>
                     <td>
                         <form action="{{ route('cart.remove', $id) }}" method="POST">
@@ -179,8 +200,6 @@
             <label class="form-label">Địa chỉ giao hàng</label>
             <textarea name="address" class="form-control" rows="2" required>{{ old('address', $userAddress) }}</textarea>
         </div>
-
-
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
 @endif
