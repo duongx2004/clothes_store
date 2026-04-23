@@ -1,52 +1,71 @@
 @extends('admin.layouts.app')
-@section('title', 'Quản lý sản phẩm')
+@section('title', 'Thêm sản phẩm')
 @section('content')
 <h1>Thêm sản phẩm</h1>
 <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="mb-3">
-        <label class="form-label">Tên sản phẩm</label>
-        <input type="text" name="name" class="form-control" required>
+        <label>Tên sản phẩm</label>
+        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" required>
+        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
     <div class="mb-3">
-        <label class="form-label">Slug</label>
-        <input type="text" name="slug" class="form-control" required>
+        <label>Slug</label>
+        <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror" required>
+        @error('slug')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
     <div class="mb-3">
-        <label class="form-label">Mô tả</label>
-        <textarea name="description" class="form-control" rows="3" required></textarea>
+        <label>Mô tả</label>
+        <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="3"></textarea>
+        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
     <div class="mb-3">
-        <label class="form-label">Giá (VNĐ)</label>
-        <input type="number" name="price" class="form-control" step="1000" required>
+        <label>Giá gốc (VNĐ)</label>
+        <input type="number" name="price" class="form-control @error('price') is-invalid @enderror" required>
+        @error('price')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
     <div class="mb-3">
-        <label class="form-label">Giá khuyến mãi (VNĐ)</label>
-        <input type="number" name="sale_price" class="form-control" value="{{ old('sale_price', $product->sale_price ?? '') }}" step="1000">
-        <small class="text-muted">Để trống nếu không giảm giá.</small>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Phần trăm giảm (%)</label>
-        <input type="number" name="discount_percent" class="form-control" value="{{ old('discount_percent', $product->discount_percent ?? '') }}" min="0" max="100">
-        <small class="text-muted">Ưu tiên: nếu có giá khuyến mãi, sẽ dùng giá đó; nếu không thì tính theo %.</small>
+        <label>Giá khuyến mãi (VNĐ)</label>
+        <input type="number" name="sale_price" class="form-control">
     </div>
     <div class="mb-3">
-        <label class="form-label">Tồn kho</label>
-        <input type="number" name="stock" class="form-control" required>
+        <label>Phần trăm giảm (%)</label>
+        <input type="number" name="discount_percent" class="form-control" min="0" max="100">
     </div>
     <div class="mb-3">
-        <label class="form-label">Danh mục</label>
-        <select name="category_id" class="form-control" required>
+        <label>Tồn kho</label>
+        <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror" required>
+        @error('stock')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="mb-3">
+        <label>Danh mục</label>
+        <select name="category_id" class="form-control @error('category_id') is-invalid @enderror" required>
+            <option value="">-- Chọn danh mục --</option>
             @foreach($categories as $cat)
-                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
             @endforeach
         </select>
+        @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
     <div class="mb-3">
-        <label class="form-label">Hình ảnh</label>
+        <label>Thương hiệu</label>
+        <select name="brand_id" class="form-control @error('brand_id') is-invalid @enderror">
+            <option value="">-- Chọn thương hiệu --</option>
+            @foreach($brands as $brand)
+                <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+            @endforeach
+        </select>
+        @error('brand_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="mb-3">
+        <label>Hình ảnh</label>
         <input type="file" name="image" class="form-control" accept="image/*">
     </div>
-    <button type="submit" class="btn btn-primary">Lưu</button>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
+    </div>
 </form>
 @endsection

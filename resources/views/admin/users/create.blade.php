@@ -31,6 +31,11 @@
         </select>
         @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
-    <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
+    </div>
 </form>
 @endsection
