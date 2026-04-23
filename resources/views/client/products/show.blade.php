@@ -331,7 +331,11 @@
                 @csrf
                 <button type="submit" class="btn btn-success"><i class="bi bi-cart d-inline-block mx-1"></i> THÊM VÀO GIỎ HÀNG</button>
             </form>
-            <a href="{{ route('cart.index') }}" class="btn btn-primary"> MUA NGAY</a>
+            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="buy_now" value="1">
+                <button type="submit" class="btn btn-primary">MUA NGAY</button>
+            </form>
         </div>
     </div>
 

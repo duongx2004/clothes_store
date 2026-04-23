@@ -16,10 +16,12 @@ Route::get('/products/{slug}', [ProductController::class, 'show'])->name('produc
 Route::post('/search-suggestions', [ProductController::class, 'suggestions'])->name('search.suggestions');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
-Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
+});
 
 Route::view('/contact', 'client.contact')->name('contact');
 Route::view('/about', 'client.about')->name('about');
