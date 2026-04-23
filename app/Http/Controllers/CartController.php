@@ -14,7 +14,17 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        return view('client.cart.index', compact('cart'));
+        $userAddress = null;
+        $userCity = null;
+
+        // Nếu người dùng đã đăng nhập và giỏ hàng có sản phẩm, lấy địa chỉ  từ user
+        if (auth()->check() && !empty($cart)) {
+            $user = auth()->user();
+            $userAddress = $user->address;
+         
+        }
+
+        return view('client.cart.index', compact('cart', 'userAddress',));
     }
 
     public function add(Request $request, $id)
@@ -91,6 +101,11 @@ class CartController extends Controller
             return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để thanh toán');
         }
 
+        $validated = $request->validate([
+            'payment_method' => ['required', 'in:cod,vnpay'],
+            'address' => ['required', 'string', 'max:500'],
+        ]);
+
         $cart = session()->get('cart', []);
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống');
@@ -108,14 +123,15 @@ class CartController extends Controller
         }
 
         $total = array_sum(array_map(fn($item) => $item['price'] * $item['quantity'], $cart));
+        $shippingAddress = trim($validated['address']);
 
         // Tạo đơn hàng
         $order = Order::create([
             'user_id' => auth()->id(),
             'total_amount' => $total,
-            'shipping_address' => $request->address ?? 'Chưa cập nhật',
+            'shipping_address' => $shippingAddress,
             'status' => 'pending',
-            'payment_method' => $request->payment_method,
+            'payment_method' => $validated['payment_method'],
         ]);
 
         // Tạo order items và trừ stock (dùng transaction)
@@ -137,7 +153,7 @@ class CartController extends Controller
         session()->forget('cart');
 
         // Xử lý theo phương thức thanh toán
-        if ($request->payment_method === 'vnpay') {
+        if ($validated['payment_method'] === 'vnpay') {
             $vnpay = new VNPayService();
             $paymentUrl = $vnpay->createPayment($order);
             if ($paymentUrl) {

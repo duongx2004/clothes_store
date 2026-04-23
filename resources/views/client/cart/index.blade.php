@@ -177,8 +177,9 @@
 
         <div class="mb-3">
             <label class="form-label">Địa chỉ giao hàng</label>
-            <textarea name="address" class="form-control" rows="2" required></textarea>
+            <textarea name="address" class="form-control" rows="2" required>{{ old('address', $userAddress) }}</textarea>
         </div>
+
 
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
