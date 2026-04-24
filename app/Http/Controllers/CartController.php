@@ -3,14 +3,56 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\CartItem;
 use App\Services\VNPayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
+    /**
+     * Get cart from database (for logged-in users) or session (for guests)
+     */
+    private function getCart()
+    {
+        if (auth()->check()) {
+            $dbCart = CartItem::where('user_id', auth()->id())
+                ->with('product')
+                ->get();
+            $cart = [];
+            foreach ($dbCart as $item) {
+                $cart[$item->product_id] = [
+                    'name' => $item->product->name,
+                    'price' => $item->price,
+                    'image' => $item->product->image,
+                    'quantity' => $item->quantity,
+                ];
+            }
+            return $cart;
+        }
+        return session()->get('cart', []);
+    }
+
+    /**
+     * Save cart to database for logged-in users
+     */
+    private function saveCartToDb($cart)
+    {
+        if (auth()->check()) {
+            CartItem::where('user_id', auth()->id())->delete();
+            foreach ($cart as $productId => $item) {
+                CartItem::create([
+                    'user_id' => auth()->id(),
+                    'product_id' => $productId,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                ]);
+            }
+        }
+    }
+
     public function index()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->getCart();
         $userAddress = null;
 
         // Nếu người dùng đã đăng nhập và giỏ hàng có sản phẩm, lấy địa chỉ & thành phố từ user
@@ -24,8 +66,12 @@ class CartController extends Controller
 
     public function add(Request $request, $id)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+        }
+
         $product = Product::findOrFail($id);
-        $cart = session()->get('cart', []);
+        $cart = $this->getCart();
         $quantity = max(1, (int) $request->input('quantity', 1));
 
         if ($product->stock < 1) {
@@ -43,10 +89,13 @@ class CartController extends Controller
                 'quantity' => min($quantity, $product->stock),
             ];
         }
+        
+        // Save to session for guests and DB for logged-in users
         session()->put('cart', $cart);
+        $this->saveCartToDb($cart);
 
         if ($request->has('buy_now')) {
-            return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm, vui lòng kiểm tra giỏ hàng.');
+            return redirect()->route('checkout.show');
         }
         return back()->with('success', 'Đã thêm vào giỏ hàng');
     }
@@ -59,7 +108,7 @@ class CartController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $cart = session()->get('cart', []);
+        $cart = $this->getCart();
 
         if (!isset($cart[$id])) {
             return redirect()->route('cart.index')->with('error', 'Sản phẩm không tồn tại trong giỏ hàng');
@@ -92,16 +141,26 @@ class CartController extends Controller
 
         $cart[$id]['quantity'] = $newQty;
         session()->put('cart', $cart);
+        $this->saveCartToDb($cart);
 
         return redirect()->route('cart.index')->with('success', 'Đã cập nhật số lượng');
     }
 
     public function remove($id)
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->getCart();
         unset($cart[$id]);
         session()->put('cart', $cart);
+        $this->saveCartToDb($cart);
         return redirect()->route('cart.index');
+    }
+
+    public function showCheckout()
+    {
+        $cart = $this->getCart();
+        $userAddress = auth()->user()?->address;
+
+        return view('client.cart.index', compact('cart', 'userAddress'));
     }
 
     public function checkout(Request $request)
@@ -115,7 +174,7 @@ class CartController extends Controller
             'address' => ['required', 'string', 'max:500'],
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->getCart();
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống');
         }
@@ -158,6 +217,7 @@ class CartController extends Controller
         });
 
         session()->forget('cart');
+        CartItem::where('user_id', auth()->id())->delete();
 
         if ($validated['payment_method'] === 'vnpay') {
             $vnpay = new VNPayService();

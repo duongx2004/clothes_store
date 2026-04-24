@@ -108,6 +108,19 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+        
+        // Kiểm tra xem sản phẩm có đơn hàng liên kết không
+        if ($product->orderItems()->exists()) {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Không thể xóa sản phẩm này vì nó có liên kết với các đơn hàng. Vui lòng kiểm tra lại đơn hàng trước khi xóa.');
+        }
+        
+        // Kiểm tra xem sản phẩm có trong giỏ hàng của user không
+        if ($product->cartItems()->exists()) {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Không thể xóa sản phẩm này vì nó hiện đang trong giỏ hàng của người dùng. Vui lòng thử lại sau.');
+        }
+        
         if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
             unlink(public_path('images/products/' . $product->image));
         }
