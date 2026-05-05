@@ -24,7 +24,21 @@
             <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">About</a>
             <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
             @auth
-                <a href="{{ route('cart.index') }}" class="{{ request()->routeIs('cart.*') ? 'active' : '' }}">Cart</a>
+                <a href="{{ route('cart.index') }}" class="{{ request()->routeIs('cart.*') ? 'active' : '' }}">
+                    Cart
+                    @php
+                        $cartCount = 0;
+                        if (auth()->check()) {
+                            $cartCount = \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity');
+                        } else {
+                            $cart = session()->get('cart', []);
+                            $cartCount = array_sum(array_column($cart, 'quantity'));
+                        }
+                    @endphp
+                    @if($cartCount > 0)
+                        <span class="cart-badge">{{ $cartCount }}</span>
+                    @endif
+                </a>
             @endauth
         </nav>
 
@@ -253,7 +267,25 @@
         }
 
         .site-nav a {
-            width: 100%;
+            position: relative;
+            display: inline-block;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
         }
 
         .menu-toggle:checked ~ .site-nav {

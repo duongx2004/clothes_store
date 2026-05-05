@@ -152,7 +152,7 @@ class CartController extends Controller
         unset($cart[$id]);
         session()->put('cart', $cart);
         $this->saveCartToDb($cart);
-        return redirect()->route('cart.index');
+        return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng');
     }
 
     public function showCheckout()
