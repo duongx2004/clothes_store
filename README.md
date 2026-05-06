@@ -227,6 +227,29 @@ user@example.com
 ```bash
 123456
 ```
+💳 Tích hợp thanh toán VNPay (quan trọng)
+Vấn đề: Không thể đăng ký VNPay Sandbox với localhost
+VNPay yêu cầu Website URL và Return URL phải là địa chỉ công khai (không dùng 127.0.0.1). Để test VNPay trên local, bạn cần dùng ngrok để tạo một đường hầm (tunnel) từ internet vào localhost.
+
+Các bước dùng ngrok:
+1. Tải và cài đặt ngrok
+Truy cập ngrok.com/download, tải bản phù hợp với hệ điều hành của bạn. Giải nén và chạy file ngrok.exe (hoặc đưa vào PATH).
+2. Chạy Laravel server (giữ cửa sổ terminal này mở):
+```bash
+php artisan serve
+```
+3. Chạy ngrok (mở terminal mới, di chuyển đến thư mục chứa ngrok):
+```bash
+ngrok http 8000
+```
+Kết quả sẽ hiển thị một URL công khai, ví dụ: https://abc123.ngrok-free.app
+4. Cập nhật file .env với URL do ngrok cung cấp:
+```bash
+VNPAY_RETURN_URL=https://abc123.ngrok-free.app/vnpay-return
+```
+Sau đó chạy php artisan config:clear.
+5. Liên kết VNPAY SANDBOX
+
 🧪 Hướng dẫn sử dụng
 Khách hàng
 
@@ -295,12 +318,11 @@ Lỗi middleware admin không hoạt động: đăng ký trong app/Http/Kernel.p
 
 Lỗi create() argument count: đảm bảo method create() trong RegisteredUserController không có tham số.
 
-📝 Phân công việc:
+👥 Phân công việc
+Lê Nho Dương: Xây dựng các trang Auth, Admin và các chức năng cần thiết của trang (quản lý sản phẩm, đơn hàng, tài khoản, thương hiệu, danh mục, doanh thu).
 
-Lê Nho Dương: Xây dựng các trang Auth, Admin và các chức năng cần thiết của trang
+Hà Quang Nhuận: Xây dựng trang chủ chính và các Controller liên quan (HomeController, banner, sản phẩm nổi bật).
 
-Hà Quang Nhuận: Xây dựng trang chủ chính và các Controller liên quan
+Mai Đức Long: Xây dựng trang Cart và các Controller liên quan (giỏ hàng, thanh toán COD, tích hợp VNPay).
 
-Mai Đức Long: Xây dựng trang Cart và các Controller liên quan
-
-Đăng Văn Minh: Xây dựng trang Product và các Controller liên quan
+Đăng Văn Minh: Xây dựng trang Product và các Controller liên quan (hiển thị sản phẩm, chi tiết, sản phẩm cùng loại, tìm kiếm, lọc, sắp xếp).

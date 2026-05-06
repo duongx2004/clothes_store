@@ -42,8 +42,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+    Route::get('/products/import', [\App\Http\Controllers\Admin\ProductController::class, 'importForm'])->name('products.import.form');
+    Route::post('/products/import', [\App\Http\Controllers\Admin\ProductController::class, 'import'])->name('products.import');
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::get('/revenue', [\App\Http\Controllers\Admin\RevenueController::class, 'index'])->name('revenue.index');
     Route::resource('brands', \App\Http\Controllers\Admin\BrandController::class);

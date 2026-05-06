@@ -3,7 +3,12 @@
 @section('content')
 <div class="d-flex justify-content-between mb-3">
     <h1>Sản phẩm</h1>
-    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ Thêm sản phẩm</a>
+    <div>
+        <a href="{{ route('admin.products.import.form') }}" class="btn btn-info me-2">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Import CSV
+        </a>
+        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ Thêm sản phẩm</a>
+    </div>
 </div>
 <table class="table table-bordered">
     <thead>
