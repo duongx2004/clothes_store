@@ -35,16 +35,43 @@ Route::middleware(['auth'])->group(function () {
         $orders = auth()->user()->orders()->with('items.product')->get();
         return view('client.orders', compact('orders'));
     })->name('client.orders');
-    Route::get('/profile', [ProfileController::class, 'showForm'])->name('profile.show');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/change-password', [ChangePasswordController::class, 'showForm'])->name('change.password.form');
-    Route::post('/change-password', [ChangePasswordController::class, 'update'])->name('change.password.update');
-});
+    Route::get('/my-orders/{id}', function ($id) {
+        $order = auth()->user()->orders()->with('items.product')->findOrFail($id);
+        return view('client.order-detail', compact('order'));
+    })->name('client.order.detail');
+    Route::put('/my-orders/{id}/cancel', function ($id) {
+    $order = auth()->user()->orders()->findOrFail($id);
+    if ($order->status !== 'pending') {
+        return back()->with('error', 'Đơn hàng không thể hủy.');
+    }
+    $order->status = 'cancelled';
+    $order->save();
+    foreach ($order->items as $item) {
+        $item->product->increment('stock', $item->quantity);
+    }
+    return redirect()->route('client.orders')->with('success', 'Đơn hàng đã được hủy.');
+    })->name('client.order.cancel');
+    Route::post('/my-orders/{id}/refund-request', function ($id) {
+        $order = auth()->user()->orders()->findOrFail($id);
+        if ($order->status !== 'completed' || $order->refund_requested) {
+            return back()->with('error', 'Không thể yêu cầu hoàn tiền cho đơn hàng này.');
+        }
+        $order->refund_requested = true;
+        $order->save();
+        return back()->with('success', 'Yêu cầu hoàn tiền đã được gửi. Admin sẽ xử lý.');
+    })->name('client.refund.request');
+        Route::get('/profile', [ProfileController::class, 'showForm'])->name('profile.show');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('/change-password', [ChangePasswordController::class, 'showForm'])->name('change.password.form');
+        Route::post('/change-password', [ChangePasswordController::class, 'update'])->name('change.password.update');
+    });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products/import', [\App\Http\Controllers\Admin\ProductController::class, 'importForm'])->name('products.import.form');
     Route::post('/products/import', [\App\Http\Controllers\Admin\ProductController::class, 'import'])->name('products.import');
+    Route::post('/orders/{id}/approve-refund', [\App\Http\Controllers\Admin\OrderController::class, 'approveRefund'])->name('orders.approve_refund');
+
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);

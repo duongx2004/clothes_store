@@ -27,21 +27,31 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $newStatus = $request->status;
 
-        // Xử lý hoàn / trừ tồn kho khi hủy hoặc khôi phục đơn hàng
+        $request->validate([
+            'status' => 'required|in:pending,processing,completed,cancelled,refunded'
+        ]);
+
+        // Hoàn stock khi hủy (pending -> cancelled)
         if ($newStatus == 'cancelled' && $oldStatus != 'cancelled') {
             foreach ($order->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->increment('stock', $item->quantity);
-                }
+                $item->product->increment('stock', $item->quantity);
             }
-        } elseif ($oldStatus == 'cancelled' && $newStatus != 'cancelled') {
+        }
+        // Hoàn stock và hoàn tiền (completed -> refunded)
+        elseif ($newStatus == 'refunded' && $oldStatus == 'completed') {
             foreach ($order->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product && $product->stock >= $item->quantity) {
-                    $product->decrement('stock', $item->quantity);
+                $item->product->increment('stock', $item->quantity);
+            }
+            // (Tùy chọn) ghi nhận thời gian hoàn tiền
+            // $order->refunded_at = now();
+        }
+        // Khôi phục đơn từ cancelled -> khác (trừ stock lại)
+        elseif ($oldStatus == 'cancelled' && $newStatus != 'cancelled') {
+            foreach ($order->items as $item) {
+                if ($item->product->stock >= $item->quantity) {
+                    $item->product->decrement('stock', $item->quantity);
                 } else {
-                    return redirect()->back()->with('error', "Không thể khôi phục đơn hàng vì sản phẩm không đủ tồn kho.");
+                    return back()->with('error', 'Không thể khôi phục do không đủ tồn kho.');
                 }
             }
         }
@@ -49,19 +59,32 @@ class OrderController extends Controller
         $order->status = $newStatus;
         $order->save();
 
-        return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành công.');
+        return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái thành công.');
+    }
+
+    public function approveRefund($id)
+    {
+        $order = Order::findOrFail($id);
+        if ($order->status != 'completed' || !$order->refund_requested) {
+            return back()->with('error', 'Không thể hoàn tiền cho đơn hàng này.');
+        }
+        // Hoàn lại tồn kho
+        foreach ($order->items as $item) {
+            $item->product->increment('stock', $item->quantity);
+        }
+        $order->status = 'refunded';
+        $order->refund_requested = false;
+        // Nếu có cột refunded_at, có thể set ở đây
+        $order->save();
+        return redirect()->route('admin.orders.index')->with('success', 'Đã hoàn tiền và cập nhật tồn kho.');
     }
 
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
-        // Nếu đơn hàng chưa hoàn thành, hoàn lại tồn kho trước khi xóa
         if ($order->status != 'cancelled' && $order->status != 'completed') {
             foreach ($order->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->increment('stock', $item->quantity);
-                }
+                $item->product->increment('stock', $item->quantity);
             }
         }
         $order->delete();

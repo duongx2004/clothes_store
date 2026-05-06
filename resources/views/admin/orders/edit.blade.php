@@ -27,10 +27,13 @@
                             @if($order->status == 'pending') bg-warning
                             @elseif($order->status == 'processing') bg-info
                             @elseif($order->status == 'completed') bg-success
-                            @else bg-secondary
-                            @endif">
-                            {{ ucfirst($order->status) }}
+                            @elseif($order->status == 'refunded') bg-secondary
+                            @else bg-dark @endif">
+                            {{ $order->status == 'refunded' ? 'Hoàn tiền' : ucfirst($order->status) }}
                         </span>
+                        @if($order->refund_requested && $order->status == 'completed')
+                            <span class="badge bg-warning ms-2">Yêu cầu hoàn tiền</span>
+                        @endif
                     </div>
                 </div>
                 <hr>
@@ -58,7 +61,7 @@
             <div class="card-body p-0">
                 <table class="table table-bordered mb-0">
                     <thead class="table-light">
-                        <tr><th>Sản phẩm</th><th class="text-center">SL</th><th class="text-end">Đơn giá</th><th class="text-end">Thành tiền</th></tr>
+                        <tr><th>Sản phẩm</th><th class="text-center">Số lượng</th><th class="text-end">Đơn giá</th><th class="text-end">Thành tiền</th></tr>
                     </thead>
                     <tbody>
                         @php $total = 0; @endphp
@@ -75,7 +78,7 @@
                     <tfoot class="table-light">
                         <tr><th colspan="3" class="text-end">Tổng cộng</th>
                         <th class="text-end">{{ number_format($total, 0, ',', '.') }}₫</th>
-                    </tr>
+                    </table>
                 </table>
             </div>
         </div>
@@ -98,6 +101,7 @@
                             <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing (Đang xử lý)</option>
                             <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Completed (Hoàn thành)</option>
                             <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled (Hủy)</option>
+                            <option value="refunded" {{ $order->status == 'refunded' ? 'selected' : '' }}>Refunded (Hoàn tiền)</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
@@ -105,7 +109,7 @@
             </div>
         </div>
 
-        <!-- Hành động nhanh -->
+        <!-- Hành động nhanh + duyệt hoàn tiền -->
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">Hành động</h5>
@@ -114,14 +118,10 @@
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary w-100 mb-2">
                     <i class="bi bi-arrow-left"></i> Quay lại danh sách
                 </a>
-                @if($order->status != 'cancelled')
-                <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" onsubmit="return confirm('Hủy đơn hàng này sẽ hoàn lại tồn kho. Bạn có chắc?')">
+                @if($order->refund_requested && $order->status == 'completed')
+                <form action="{{ route('admin.orders.approve_refund', $order->id) }}" method="POST" onsubmit="return confirm('Duyệt hoàn tiền cho đơn hàng này?')">
                     @csrf
-                    @method('PUT')
-                    <input type="hidden" name="status" value="cancelled">
-                    <button type="submit" class="btn btn-danger w-100">
-                        <i class="bi bi-x-circle"></i> Hủy đơn hàng
-                    </button>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Duyệt hoàn tiền</button>
                 </form>
                 @endif
             </div>
