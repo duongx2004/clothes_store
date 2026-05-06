@@ -80,7 +80,7 @@
 
     .filter-grid {
         display: grid;
-        grid-template-columns: 1.1fr 1fr auto;
+        grid-template-columns: 1fr 1fr 1fr auto;
         gap: 14px;
         align-items: end;
     }
@@ -330,7 +330,7 @@
         <div class="filter-header">
             <div>
                 <h2 class="filter-title">Bộ lọc sản phẩm</h2>
-                <p class="filter-description">Chọn nhãn hàng và cách sắp xếp giá để tìm sản phẩm nhanh hơn.</p>
+                <p class="filter-description">Chọn danh mục, nhãn hàng và cách sắp xếp giá để tìm sản phẩm nhanh hơn.</p>
             </div>
             <span class="filter-badge"><i class="bi bi-funnel"></i> Lọc thông minh</span>
         </div>
@@ -339,6 +339,18 @@
             @if(request('search'))
                 <input type="hidden" name="search" value="{{ request('search') }}">
             @endif
+
+            <div class="filter-field">
+                <label for="category_id" class="form-label">Danh mục</label>
+                <select class="form-select" id="category_id" name="category_id">
+                    <option value="">Tất cả</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
             <div class="filter-field">
                 <label for="brand_id" class="form-label">Nhãn hàng</label>

@@ -13,11 +13,9 @@ class ProductController extends Controller
     {
         $query = Product::with(['category', 'brand']);
 
-        // Filter by category (by name)
-        if ($request->filled('category')) {
-            $query->whereHas('category', function($q) use ($request) {
-                $q->where('name', $request->category);
-            });
+        // Filter by category (by id)
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
         }
 
         // Filter by brand (by name)

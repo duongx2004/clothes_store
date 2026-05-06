@@ -356,6 +356,51 @@
         </div>
     </section>
 
+    @if($discountedProducts->count() > 0)
+    <section class="home-panel">
+        <div class="home-section-head">
+            <h2>Sản phẩm đang giảm giá</h2>
+            <a href="{{ route('products.index') }}" class="home-btn home-btn-secondary">Xem tất cả</a>
+        </div>
+
+        <div class="home-products">
+            @foreach($discountedProducts as $product)
+            @php
+                $hasSale = !is_null($product->sale_price) && $product->sale_price > 0;
+                $hasDiscountPercent = !is_null($product->discount_percent) && $product->discount_percent > 0;
+                $salePrice = null;
+                $percent = 0;
+                if ($hasSale) {
+                    $salePrice = $product->sale_price;
+                    $percent = round((1 - $salePrice / $product->price) * 100);
+                } elseif ($hasDiscountPercent) {
+                    $salePrice = $product->price * (1 - $product->discount_percent / 100);
+                    $percent = $product->discount_percent;
+                }
+            @endphp
+            <a href="{{ route('products.show', $product->slug) }}" class="home-product-card" aria-label="Xem chi tiết {{ $product->name }}">
+                <div class="home-product-image">
+                    <img src="{{ $product->image ? asset('images/products/'.$product->image) : 'https://via.placeholder.com/300' }}" alt="{{ $product->name }}" loading="lazy">
+                </div>
+                <div class="home-product-body">
+                    <h3 class="home-product-title">{{ $product->name }}</h3>
+                    @if($salePrice && $salePrice < $product->price)
+                        <div class="price-wrapper">
+                            <span class="original-price">{{ number_format($product->price, 0, ',', '.') }}₫</span>
+                            <span class="sale-price">{{ number_format($salePrice, 0, ',', '.') }}₫</span>
+                            <span class="discount-badge">-{{ $percent }}%</span>
+                        </div>
+                    @else
+                        <p class="home-product-price">{{ number_format($product->price, 0, ',', '.') }}₫</p>
+                    @endif
+                    <span class="home-btn home-btn-secondary">Xem chi tiết</span>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </section>
+    @endif
+
     <section class="home-panel">
         <div class="home-features">
             <article class="home-feature-card">
