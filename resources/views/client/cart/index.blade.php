@@ -53,7 +53,7 @@
     }
 
     .qty-box {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         gap: 0.45rem;
         border: 1px solid #e4e4e4;
@@ -68,6 +68,14 @@
         height: 28px;
         padding: 0;
         line-height: 1;
+    }
+
+    .qty-input {
+        width: 50px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 2px;
     }
 
     .checkout-form .form-control:focus {
@@ -152,12 +160,34 @@
                                 <button type="submit" class="btn btn-sm btn-outline-secondary" 
                                     {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>−</button>
                             </form>
-                            <span style="min-width: 30px; text-align: center;">{{ $item['quantity'] }}</span>
+                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" 
+                                min="1" max="{{ $stock }}" class="qty-input">
                             <form action="{{ route('cart.update', $id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 <input type="hidden" name="action" value="increase">
                                 <button type="submit" class="btn btn-sm btn-outline-secondary" 
                                     {{ $item['quantity'] >= $stock ? 'disabled' : '' }}>+</button>
+                            </form>
+                            <form id="update-form-{{ $id }}" action="{{ route('cart.update', $id) }}" method="POST" style="display: inline;">
+                                @csrf
+                                <input type="hidden" name="quantity" id="qty-hidden-{{ $id }}">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-success btn-sm"
+                                    style="
+                                        border-radius: 8px;
+                                        padding: 6px 20px;
+                                        transition: all 0.2s ease;
+                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                        font-weight: 500;
+                                        white-space: nowrap;
+                                        min-width: 110px;
+                                    "
+                                    onmouseover="this.style.transform='scale(1.03)'"
+                                    onmouseout="this.style.transform='scale(1)'"
+                                >
+                                    Cập nhật
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -203,4 +233,18 @@
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
 @endif
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    @foreach($cart as $id => $item)
+    const updateForm{{ $id }} = document.getElementById('update-form-{{ $id }}');
+    const qtyInput{{ $id }} = updateForm{{ $id }}.parentElement.querySelector('.qty-input');
+    const qtyHidden{{ $id }} = document.getElementById('qty-hidden-{{ $id }}');
+
+    updateForm{{ $id }}.addEventListener('submit', function() {
+        qtyHidden{{ $id }}.value = qtyInput{{ $id }}.value;
+    });
+    @endforeach
+});
+</script>
 @endsection
